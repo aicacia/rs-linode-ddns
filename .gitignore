@@ -1,0 +1,12 @@
+/.vscode
+/.cargo/config.toml
+/target
+/config.json
+/!config.example.json
+
+# linode-api-client
+/linode-api-client/.openapi-generator
+/linode-api-client/.openapi-generator-ignore
+/linode-api-client/.travis.yml
+/linode-api-client/git_push.sh
+/openapitools.json

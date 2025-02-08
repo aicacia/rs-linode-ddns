@@ -1,0 +1,82 @@
+[package]
+authors = ["Nathan Faucett <nathanfaucett@gmail.com>"]
+description = "Linode DDNS"
+
+categories = ["database"]
+keywords = ["database", "typescript", "postgres", "mysql", "sqlite"]
+
+edition = "2021"
+license = "MIT/Apache-2.0"
+name = "linode-ddns"
+repository = "https://github.com/aicacia/linode-ddns"
+rust-version = "1.56"
+version = "0.1.0"
+
+default-run = "linode-ddns"
+
+[lib]
+name = "linode_ddns"
+path = "src/lib.rs"
+
+[[bin]]
+name = "linode-ddns"
+path = "src/main.rs"
+
+[features]
+default = ["completions"]
+
+completions = ["dep:clap_complete"]
+
+[dependencies]
+config = { version = "0.15", default-features = false, features = ["json"] }
+
+clap = { version = "4.5", default-features = false, features = [
+  "derive",
+  "env",
+] }
+clap_complete = { version = "4.5", default-features = false, optional = true }
+
+log = { version = "0.4", default-features = false }
+tracing = { version = "0.1", default-features = false, features = ["std"] }
+tracing-subscriber = { version = "0.3", default-features = false, features = [
+  "ansi",
+  "fmt",
+  "std",
+  "tracing-log",
+  "env-filter",
+] }
+
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde_json = { version = "1.0", default-features = false }
+
+linode-api-client = { path = "./linode-api-client", default-features = false }
+public-ip = { version = "0.2", default-features = false, features = [
+  "all-providers",
+  "tokio-dns-resolver",
+  "tokio-http-resolver",
+] }
+
+tokio = { version = "1.43", default-features = false, features = [
+  "rt",
+  "signal",
+  "rt-multi-thread",
+  "macros",
+] }
+tokio-util = { version = "0.7", default-features = false, features = ["io"] }
+reqwest = { version = "0.12", default-features = false, features = [
+  "rustls-tls",
+  "json",
+] }
+
+url = { version = "2.5", default-features = false }
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = "thin"
+opt-level = "z"
+strip = true
+
+[workspace]
+members = ["linode-api-client"]

@@ -1,0 +1,11 @@
+FROM alpine:3.21
+LABEL org.opencontainers.image.source=https://github.com/aicacia/rs-linode-ddns
+
+WORKDIR /app
+
+ARG TARGET=x86_64-unknown-linux-musl
+COPY ./target/${TARGET}/release/linode-ddns /usr/local/bin
+
+ENV RUN_MODE=production
+
+CMD ["linode-ddns", "-c", "/app/config.json", "watch"]
