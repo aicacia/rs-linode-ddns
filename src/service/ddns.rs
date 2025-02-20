@@ -34,11 +34,21 @@ pub async fn ddns(config: &Config, cli_domains: Option<&[String]>) -> io::Result
       "No public IP address found",
     ));
   }
+  log::info!("Public IP address found: IPV4: {addr_v4:?} IPV6: {addr_v6:?}");
 
   let configuration = linode_configuration(config);
   let linode_domains = get_domains(&configuration).await?;
 
   for domain in domains {
+    if let Some(linode_domain) = linode_domains
+      .iter()
+      .find(|d| d.domain.as_ref() == Some(&domain))
+    {
+      if let Some(id) = linode_domain.id {
+        update_domain_dns(&configuration, &domain, Some(""), id, addr_v4, addr_v6).await?;
+        continue;
+      }
+    }
     let parts = domain.split('.').collect::<Vec<&str>>();
     let subdomain_name = if parts.len() > 2 {
       Some(parts[0])
@@ -50,7 +60,6 @@ pub async fn ddns(config: &Config, cli_domains: Option<&[String]>) -> io::Result
     } else {
       domain.to_string()
     };
-
     if let Some(linode_domain) = linode_domains
       .iter()
       .find(|d| d.domain.as_ref() == Some(&domain_name))
@@ -85,10 +94,8 @@ async fn update_domain_dns(
   let mut ipv4_record = None;
   let mut ipv6_record = None;
   for domain_record in get_domain_records(configuration, domain_id).await? {
-    if let Some(subdomain_name) = subdomain_name {
-      if Some(subdomain_name) != domain_record.name.as_ref().map(String::as_ref) {
-        continue;
-      }
+    if subdomain_name != domain_record.name.as_ref().map(String::as_ref) {
+      continue;
     }
     match domain_record.r#type {
       Some(get_domain_records_200_response_data_inner::TypeEnum::A) => {
