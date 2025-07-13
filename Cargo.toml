@@ -56,7 +56,7 @@ public-ip = { version = "0.2", default-features = false, features = [
   "tokio-http-resolver",
 ] }
 
-tokio = { version = "1.43", default-features = false, features = [
+tokio = { version = "1.46", default-features = false, features = [
   "rt",
   "signal",
   "rt-multi-thread",
